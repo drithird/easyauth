@@ -275,7 +275,7 @@ class EasyAuthServer:
         assert "KEY_NAME" in os.environ, f"missing KEY_NAME env variable"
         key_path = os.getenv("KEY_PATH", "")
 
-        if not os.path.exists(key_path + ".key"):
+        if not os.path.exists(key_path):
             os.makedirs(key_path)
 
         if key_path:
