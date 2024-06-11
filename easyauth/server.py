@@ -274,11 +274,18 @@ class EasyAuthServer:
         # check if keys exist in KEY_PATH else create
         assert "KEY_NAME" in os.environ, f"missing KEY_NAME env variable"
         key_path = os.getenv("KEY_PATH", "")
+
+        if not os.path.exists(key_path + ".key"):
+            os.makedirs(key_path)
+
         if key_path:
-            key_path = f"{key_path}/{os.environ['KEY_NAME']}.key"
+            key_path = f"{key_path}/{os.environ['KEY_NAME']}"
         else:
             key_path = f"{os.environ['KEY_NAME']}"
 
+        if not os.path.exists(key_path):
+            with open(key_path, "w") as file:
+                file.write("")
         try:
             with open(key_path + ".key", "r") as k:
                 self._privkey = jwk.JWK.from_json(k.readline())
@@ -429,9 +436,9 @@ class EasyAuthServer:
 
         message = MessageSchema(
             subject=f"{subject}",
-            recipients=recipients
-            if isinstance(recipients, list)
-            else [recipients],  # List of recipients, as many as you can pass
+            recipients=(
+                recipients if isinstance(recipients, list) else [recipients]
+            ),  # List of recipients, as many as you can pass
             body=body,
             subtype="html",
         )
